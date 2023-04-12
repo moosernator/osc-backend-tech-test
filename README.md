@@ -18,14 +18,17 @@ This assessment is designed to evaluate your technical proficiency in Node.js an
 
 You are tasked with developing a RESTful API for Open Study College that allows internal users to retrieve and add data to a database of distance learning courses. The API should create the following endpoints but feel free to add to this should you feel necessary:
 
-*   GET - returns a list of all courses in the database
-*   GET - returns the course with the specified ID eg. `/courses/:id`
-*   GET - limit the return results eg. `?limit=5`
-*   GET - return results in either Ascending or Descending order (Default to Ascending)
-*   GET - returns a list of all collections (Categories)
-*   GET - returns a list of all courses in a specific collection
+Endpoints: 
+*   GET Courses - returns a list of all courses in the database
+*   GET Specific course - returns the course with the specified ID eg. `/courses/:id`
+*   GET Collections - returns a list of all collections (Categories)
+*   GET Specific collection - returns a specific collection (along with all contained courses)
 
-The course data should include at least the following fields: Course Title, Course Description, Course Duration, and Course Outcome. You may use any database of your choice although a form of SQL would be preferable.
+Features:
+*   Limit the return results eg. `?limit=5`
+*   Return results in either Ascending or Descending order (Default to Ascending)
+
+The course data should include at least the following fields: ID, Course Title, Course Description, Course Duration, and Course Outcome. You may use any database of your choice although a form of SQL would be preferable.
 
 ### Part 2: Authentication and Authorisation
 
@@ -33,9 +36,9 @@ Extend the API developed in Task 1 to include authentication and authorisation f
 
 *   POST /register - allows users to create a new account
 *   POST /login - allows users to authenticate and receive an access token
-*   POST - a user can add a new course to the database
-*   PUT - a user can update a course
-*   DELETE - a user can delete a course
+*   POST a course - a user can add a new course to the database
+*   PUT a course - a user can update a course
+*   DELETE a course - a user can delete a course
 
 The API should use JSON Web Tokens (JWT) to authenticate users and authorise their access to protected resources. You may use any JWT library of your choice.
 
