@@ -21,8 +21,8 @@ You are tasked with developing a **GraphQL API** for Open Study College that all
 Your task is to build the following **GraphQL schema** and implement the associated **resolvers**.
 
 #### Required Queries: 
-* `courses(limit, sortOrder)`: Returns a list of courses in the database. Accepts optional parameters limit (integer) and sortOrder (enum: ASC | DESC).
-* `course(id)`: Returns the course with the specified id.
+* `courses(limit, sortOrder)`: Returns a list of courses in the database. Accepts optional parameters `limit` (integer) and `sortOrder` (enum: `ASC` | `DESC`).
+* `course(id)`: Returns the course with the specified `id`.
 * `collections`: Returns a list of all course collections (categories).
 * `collection(id)`: Returns a specific collection along with all contained courses.
 
