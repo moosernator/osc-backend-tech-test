@@ -48,7 +48,7 @@ Extend the GraphQL API developed in Part 1 to include **authentication** and **a
 #### Required Authentication Flow:
 * `register(username, password)`: Allows users to create a new account.
 * `login(username, password)`: Authenticates users and returns an access token (JWT).
-* `Protect the mutations (`addCourse`, `updateCourse`, and `deleteCourse`) so that only authenticated users with valid JWT tokens can perform these actions.
+* Protect the mutations (`addCourse`, `updateCourse`, and `deleteCourse`) so that only authenticated users with valid JWT tokens can perform these actions.
 
 #### Bonus:
 Implement **role-based authorisation** (e.g., Admins can perform all actions, but regular users can only add or update their own courses).
