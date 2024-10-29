@@ -3,7 +3,7 @@
 OSC Technical Assessment for a Backend Engineer
 -------------------------------------------------
 
-This assessment is designed to evaluate your technical proficiency in **Node.js**, **GraphQL**, and related backend technologies, as well as your ability to apply that knowledge to solve real-world problems.
+This assessment is designed to evaluate your technical proficiency in **TypeScript**, **Node.js**, **GraphQL**, and related backend technologies, as well as your ability to apply that knowledge to solve real-world problems.
 
 ### Instructions:
     
@@ -56,7 +56,7 @@ Implement **role-based authorisation** (e.g., Admins can perform all actions, bu
 
 ### Assessment Criteria:
 
-*   Your ability to design and develop a GraphQL API using Node.js and related technologies
+*   Your ability to design and develop a GraphQL API using TypeScript, Node.js and related technologies
 *   Your ability to configure and implement a working database.
 *   Your ability to implement **authentication** and **authorisation** using **JSON Web Tokens (JWT)**
 *   Your understanding of **best practices** for writing clean, maintainable, and efficient code.
