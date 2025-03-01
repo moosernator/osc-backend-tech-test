@@ -1,0 +1,42 @@
+enum SortOrder {
+    ASC
+    DESC
+}
+
+type Course {
+    id: ID!
+    courseTitle: String!
+    courseDescription: String!
+    courseDuration: Int! # in hours
+    courseOutcome: String!
+}
+
+input CoursesInput {
+    limit: Int
+    sortOrder: SortOrder
+}
+
+input AddCourseInput {
+    courseTitle: String!
+    courseDescription: String!
+    courseDuration: Int! # in hours
+    courseOutcome: String!
+}
+
+input UpdateCourseInput {
+    courseTitle: String
+    courseDescription: String
+    courseDuration: Int # in hours
+    courseOutcome: String
+}
+
+type Query {
+    courses(input: CoursesInput): [Course!]!
+    course(id: ID!): Course!
+}
+
+type Mutation {
+    addCourse(input: AddCourseInput!): Course!
+    updateCourse(id: ID!, input: UpdateCourseInput!): Course
+    deleteCourse(id: ID!): Course
+}
