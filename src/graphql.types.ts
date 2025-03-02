@@ -17,6 +17,7 @@ export type Scalars = {
 };
 
 export type AddCourseInput = {
+  courseCollection: Scalars['String']['input'];
   courseDescription: Scalars['String']['input'];
   courseDuration: Scalars['Int']['input'];
   courseOutcome: Scalars['String']['input'];
@@ -25,11 +26,18 @@ export type AddCourseInput = {
 
 export type Course = {
   __typename?: 'Course';
+  courseCollection: Scalars['String']['output'];
   courseDescription: Scalars['String']['output'];
   courseDuration: Scalars['Int']['output'];
   courseOutcome: Scalars['String']['output'];
   courseTitle: Scalars['String']['output'];
   id: Scalars['ID']['output'];
+};
+
+export type CourseCollection = {
+  __typename?: 'CourseCollection';
+  courses: Array<Course>;
+  id: Scalars['String']['output'];
 };
 
 export type CoursesInput = {
@@ -62,6 +70,7 @@ export type MutationUpdateCourseArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  collections: Array<CourseCollection>;
   course: Course;
   courses: Array<Course>;
 };
@@ -82,6 +91,7 @@ export enum SortOrder {
 }
 
 export type UpdateCourseInput = {
+  courseCollection?: InputMaybe<Scalars['String']['input']>;
   courseDescription?: InputMaybe<Scalars['String']['input']>;
   courseDuration?: InputMaybe<Scalars['Int']['input']>;
   courseOutcome?: InputMaybe<Scalars['String']['input']>;
@@ -162,6 +172,7 @@ export type ResolversTypes = {
   AddCourseInput: AddCourseInput;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Course: ResolverTypeWrapper<Course>;
+  CourseCollection: ResolverTypeWrapper<CourseCollection>;
   CoursesInput: CoursesInput;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
@@ -177,6 +188,7 @@ export type ResolversParentTypes = {
   AddCourseInput: AddCourseInput;
   Boolean: Scalars['Boolean']['output'];
   Course: Course;
+  CourseCollection: CourseCollection;
   CoursesInput: CoursesInput;
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
@@ -187,11 +199,18 @@ export type ResolversParentTypes = {
 };
 
 export type CourseResolvers<ContextType = any, ParentType extends ResolversParentTypes['Course'] = ResolversParentTypes['Course']> = {
+  courseCollection?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   courseDescription?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   courseDuration?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   courseOutcome?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   courseTitle?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CourseCollectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['CourseCollection'] = ResolversParentTypes['CourseCollection']> = {
+  courses?: Resolver<Array<ResolversTypes['Course']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -202,12 +221,14 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  collections?: Resolver<Array<ResolversTypes['CourseCollection']>, ParentType, ContextType>;
   course?: Resolver<ResolversTypes['Course'], ParentType, ContextType, RequireFields<QueryCourseArgs, 'id'>>;
   courses?: Resolver<Array<ResolversTypes['Course']>, ParentType, ContextType, Partial<QueryCoursesArgs>>;
 };
 
 export type Resolvers<ContextType = any> = {
   Course?: CourseResolvers<ContextType>;
+  CourseCollection?: CourseCollectionResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
 };

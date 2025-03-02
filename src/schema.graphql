@@ -9,6 +9,12 @@ type Course {
     courseDescription: String!
     courseDuration: Int! # in hours
     courseOutcome: String!
+    courseCollection: String! # singular for now, anticipate it could been an array
+}
+
+type CourseCollection {
+    name: String!
+    courses: [Course!]!
 }
 
 input CoursesInput {
@@ -21,6 +27,7 @@ input AddCourseInput {
     courseDescription: String!
     courseDuration: Int! # in hours
     courseOutcome: String!
+    courseCollection: String! # singular for now, anticipate it could been an array
 }
 
 input UpdateCourseInput {
@@ -28,11 +35,14 @@ input UpdateCourseInput {
     courseDescription: String
     courseDuration: Int # in hours
     courseOutcome: String
+    courseCollection: String # singular for now, anticipate it could been an array
 }
 
 type Query {
     courses(input: CoursesInput): [Course!]!
     course(id: ID!): Course!
+    collections: [CourseCollection!]!
+    collection(id: String!): CourseCollection! # get collection by collection name (could refactor to id if collections stored in another table with join)
 }
 
 type Mutation {

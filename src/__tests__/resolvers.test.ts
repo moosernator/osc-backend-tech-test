@@ -30,6 +30,7 @@ describe("Resolvers", () => {
             courseDescription: "Course 1 Description",
             courseDuration: 12,
             courseOutcome: "Certificate",
+            courseCollection: "Initial Courses",
         },
         {
             id: "456",
@@ -37,6 +38,7 @@ describe("Resolvers", () => {
             courseDescription: "Course 2 Description",
             courseDuration: 6,
             courseOutcome: "Certificate",
+            courseCollection: "Initial Courses",
         },
     ];
 
@@ -143,6 +145,59 @@ describe("Resolvers", () => {
                 expect(course).toEqual(mockCourses[0]);
             });
         });
+
+        describe("when calling the collections query", () => {
+            it("should return the list of collections correctly", async () => {
+                mockConnection.execute.mockResolvedValueOnce([mockCourses]);
+
+                const collections = await resolvers.Query.collections();
+
+                expect(endSpy).toHaveBeenCalledTimes(1);
+                expect(executeSpy).toHaveBeenCalledWith(
+                    "SELECT * FROM courses"
+                );
+                expect(collections).toEqual([
+                    {
+                        name: "Initial Courses",
+                        courses: mockCourses,
+                    },
+                ]);
+            });
+        });
+
+        describe("when calling the collection query", () => {
+            it("should handle an invalid collection name", async () => {
+                mockConnection.execute.mockResolvedValueOnce([[]]);
+
+                await expect(
+                    resolvers.Query.collection(null, {
+                        id: "A-Levels",
+                    })
+                ).rejects.toThrow(
+                    new GraphQLError("no collections match the provided name")
+                );
+            });
+
+            it("should return the collection with the specified name", async () => {
+                mockConnection.execute.mockResolvedValueOnce([
+                    [mockCourses[0]],
+                ]);
+
+                const collection = await resolvers.Query.collection(null, {
+                    id: "Initial Courses",
+                });
+
+                expect(endSpy).toHaveBeenCalledTimes(1);
+                expect(executeSpy).toHaveBeenCalledWith(
+                    "SELECT * FROM courses WHERE courseCollection = ?",
+                    [mockCourses[0].courseCollection]
+                );
+                expect(collection).toEqual({
+                    name: "Initial Courses",
+                    courses: [mockCourses[0]],
+                });
+            });
+        });
     });
 
     describe("Mutations", () => {
@@ -158,13 +213,20 @@ describe("Resolvers", () => {
                         courseDescription: mockCourses[0].courseDescription,
                         courseDuration: mockCourses[0].courseDuration,
                         courseOutcome: mockCourses[0].courseOutcome,
+                        courseCollection: mockCourses[0].courseCollection,
                     },
                 });
 
                 expect(executeSpy).toHaveBeenNthCalledWith(
                     1,
-                    "INSERT INTO courses (courseTitle, courseDescription, courseDuration, courseOutcome) VALUES (?, ?, ?, ?)",
-                    ["Course 1", "Course 1 Description", 12, "Certificate"]
+                    "INSERT INTO courses (courseTitle, courseDescription, courseDuration, courseOutcome, courseCollection) VALUES (?, ?, ?, ?, ?)",
+                    [
+                        "Course 1",
+                        "Course 1 Description",
+                        12,
+                        "Certificate",
+                        "Initial Courses",
+                    ]
                 );
                 expect(executeSpy).toHaveBeenNthCalledWith(
                     2,
