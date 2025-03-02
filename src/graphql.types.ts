@@ -24,6 +24,12 @@ export type AddCourseInput = {
   courseTitle: Scalars['String']['input'];
 };
 
+export type AuthResponse = {
+  __typename?: 'AuthResponse';
+  token: Scalars['String']['output'];
+  username: Scalars['String']['output'];
+};
+
 export type Course = {
   __typename?: 'Course';
   courseCollection: Scalars['String']['output'];
@@ -37,7 +43,7 @@ export type Course = {
 export type CourseCollection = {
   __typename?: 'CourseCollection';
   courses: Array<Course>;
-  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
 };
 
 export type CoursesInput = {
@@ -49,6 +55,8 @@ export type Mutation = {
   __typename?: 'Mutation';
   addCourse: Course;
   deleteCourse?: Maybe<Course>;
+  login?: Maybe<AuthResponse>;
+  register?: Maybe<Scalars['String']['output']>;
   updateCourse?: Maybe<Course>;
 };
 
@@ -63,6 +71,18 @@ export type MutationDeleteCourseArgs = {
 };
 
 
+export type MutationLoginArgs = {
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
+};
+
+
+export type MutationRegisterArgs = {
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
+};
+
+
 export type MutationUpdateCourseArgs = {
   id: Scalars['ID']['input'];
   input: UpdateCourseInput;
@@ -70,9 +90,15 @@ export type MutationUpdateCourseArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  collection: CourseCollection;
   collections: Array<CourseCollection>;
   course: Course;
   courses: Array<Course>;
+};
+
+
+export type QueryCollectionArgs = {
+  id: Scalars['String']['input'];
 };
 
 
@@ -96,6 +122,12 @@ export type UpdateCourseInput = {
   courseDuration?: InputMaybe<Scalars['Int']['input']>;
   courseOutcome?: InputMaybe<Scalars['String']['input']>;
   courseTitle?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type User = {
+  __typename?: 'User';
+  password: Scalars['String']['output'];
+  username: Scalars['String']['output'];
 };
 
 
@@ -170,6 +202,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   AddCourseInput: AddCourseInput;
+  AuthResponse: ResolverTypeWrapper<AuthResponse>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Course: ResolverTypeWrapper<Course>;
   CourseCollection: ResolverTypeWrapper<CourseCollection>;
@@ -181,11 +214,13 @@ export type ResolversTypes = {
   SortOrder: SortOrder;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   UpdateCourseInput: UpdateCourseInput;
+  User: ResolverTypeWrapper<User>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   AddCourseInput: AddCourseInput;
+  AuthResponse: AuthResponse;
   Boolean: Scalars['Boolean']['output'];
   Course: Course;
   CourseCollection: CourseCollection;
@@ -196,6 +231,13 @@ export type ResolversParentTypes = {
   Query: {};
   String: Scalars['String']['output'];
   UpdateCourseInput: UpdateCourseInput;
+  User: User;
+};
+
+export type AuthResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['AuthResponse'] = ResolversParentTypes['AuthResponse']> = {
+  token?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  username?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type CourseResolvers<ContextType = any, ParentType extends ResolversParentTypes['Course'] = ResolversParentTypes['Course']> = {
@@ -210,26 +252,37 @@ export type CourseResolvers<ContextType = any, ParentType extends ResolversParen
 
 export type CourseCollectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['CourseCollection'] = ResolversParentTypes['CourseCollection']> = {
   courses?: Resolver<Array<ResolversTypes['Course']>, ParentType, ContextType>;
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   addCourse?: Resolver<ResolversTypes['Course'], ParentType, ContextType, RequireFields<MutationAddCourseArgs, 'input'>>;
   deleteCourse?: Resolver<Maybe<ResolversTypes['Course']>, ParentType, ContextType, RequireFields<MutationDeleteCourseArgs, 'id'>>;
+  login?: Resolver<Maybe<ResolversTypes['AuthResponse']>, ParentType, ContextType, RequireFields<MutationLoginArgs, 'password' | 'username'>>;
+  register?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationRegisterArgs, 'password' | 'username'>>;
   updateCourse?: Resolver<Maybe<ResolversTypes['Course']>, ParentType, ContextType, RequireFields<MutationUpdateCourseArgs, 'id' | 'input'>>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  collection?: Resolver<ResolversTypes['CourseCollection'], ParentType, ContextType, RequireFields<QueryCollectionArgs, 'id'>>;
   collections?: Resolver<Array<ResolversTypes['CourseCollection']>, ParentType, ContextType>;
   course?: Resolver<ResolversTypes['Course'], ParentType, ContextType, RequireFields<QueryCourseArgs, 'id'>>;
   courses?: Resolver<Array<ResolversTypes['Course']>, ParentType, ContextType, Partial<QueryCoursesArgs>>;
 };
 
+export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
+  password?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  username?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type Resolvers<ContextType = any> = {
+  AuthResponse?: AuthResponseResolvers<ContextType>;
   Course?: CourseResolvers<ContextType>;
   CourseCollection?: CourseCollectionResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  User?: UserResolvers<ContextType>;
 };
 

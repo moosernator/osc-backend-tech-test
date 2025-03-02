@@ -1,14 +1,20 @@
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import { createConnection } from "mysql2/promise";
 import { Course, SortOrder } from "../graphql.types.js";
 import resolvers from "../resolvers.js";
 import { GraphQLError } from "graphql";
 
 jest.mock("mysql2/promise");
+jest.mock("bcrypt");
+jest.mock("jsonwebtoken");
 
 describe("Resolvers", () => {
     let mockConnection: any;
     const executeSpy = jest.fn();
     const endSpy = jest.fn();
+    const compareSpy = jest.spyOn(bcrypt, "compare");
+    const signSpy = jest.spyOn(jwt, "sign");
 
     beforeEach(async () => {
         mockConnection = {
@@ -17,6 +23,7 @@ describe("Resolvers", () => {
         };
 
         (createConnection as jest.Mock).mockResolvedValue(mockConnection);
+        (bcrypt.hash as jest.Mock).mockResolvedValue("hashedPassword");
     });
 
     afterEach(() => {
@@ -322,6 +329,90 @@ describe("Resolvers", () => {
                 ).rejects.toThrow(
                     new GraphQLError("no matching course found to update")
                 );
+            });
+        });
+
+        describe("when calling the register mutation", () => {
+            it("should create a new user", async () => {
+                mockConnection.execute
+                    .mockResolvedValueOnce([{ insertId: "1" }])
+                    .mockResolvedValueOnce([
+                        [{ id: 1, username: "testuser1" }],
+                    ]);
+
+                const user = await resolvers.Mutation.register(null, {
+                    username: "testuser1",
+                    password: "password123!",
+                });
+
+                expect(executeSpy).toHaveBeenNthCalledWith(
+                    1,
+                    "INSERT INTO users (username, password) VALUES (?, ?)",
+                    ["testuser1", "hashedPassword"]
+                );
+                expect(executeSpy).toHaveBeenNthCalledWith(
+                    2,
+                    "SELECT * FROM users WHERE id = ?",
+                    ["1"]
+                );
+                expect(endSpy).toHaveBeenCalledTimes(1);
+                expect(user).toEqual("testuser1");
+            });
+        });
+
+        describe("when calling the login mutation", () => {
+            it("should handle an invalid username", async () => {
+                mockConnection.execute.mockResolvedValueOnce([[]]);
+
+                await expect(
+                    resolvers.Mutation.login(null, {
+                        username: "invalid",
+                        password: "123",
+                    })
+                ).rejects.toThrow(new GraphQLError("Invalid credentials"));
+            });
+
+            it("should handle an invalid password", async () => {
+                compareSpy.mockImplementationOnce(() => false);
+                mockConnection.execute.mockResolvedValueOnce([
+                    [
+                        {
+                            username: "testuser1",
+                            password: "password123!",
+                        },
+                    ],
+                ]);
+
+                await expect(
+                    resolvers.Mutation.login(null, {
+                        username: "invalid",
+                        password: "123",
+                    })
+                ).rejects.toThrow(new GraphQLError("Invalid credentials"));
+            });
+
+            it("should login a valid user", async () => {
+                signSpy.mockImplementationOnce(() => "123");
+                compareSpy.mockImplementationOnce(() => true);
+                mockConnection.execute.mockResolvedValueOnce([
+                    [{ id: 1, username: "testuser1" }],
+                ]);
+                const authUser = await resolvers.Mutation.login(null, {
+                    username: "testuser1",
+                    password: "password123!",
+                });
+
+                expect(executeSpy).toHaveBeenNthCalledWith(
+                    1,
+                    "SELECT * FROM users WHERE username = ?",
+                    ["testuser1"]
+                );
+
+                expect(endSpy).toHaveBeenCalledTimes(1);
+                expect(authUser).toEqual({
+                    token: "123",
+                    username: "testuser1",
+                });
             });
         });
     });

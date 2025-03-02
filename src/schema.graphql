@@ -17,6 +17,16 @@ type CourseCollection {
     courses: [Course!]!
 }
 
+type User {
+    username: String!
+    password: String!
+}
+
+type AuthResponse {
+    token: String!
+    username: String!
+}
+
 input CoursesInput {
     limit: Int
     sortOrder: SortOrder
@@ -49,4 +59,6 @@ type Mutation {
     addCourse(input: AddCourseInput!): Course!
     updateCourse(id: ID!, input: UpdateCourseInput!): Course
     deleteCourse(id: ID!): Course
+    register(username: String!, password: String!): String # return just the username
+    login(username: String!, password: String!): AuthResponse
 }
