@@ -1,34 +1,42 @@
 import { GraphQLError } from "graphql";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { createDatabaseConnection } from "../database.js";
+import { Context } from "../types.js";
+import { authenticateWithJwt } from "../auth.js";
 
-export const deleteCourse = async (_parent, args: { id: number }) => {
-  const connection = await createDatabaseConnection();
+export const deleteCourse = async (
+    _parent,
+    args: { id: number },
+    context: Context
+) => {
+    authenticateWithJwt(context);
 
-  const [rows] = await connection.execute<RowDataPacket[]>(
-    "SELECT * FROM courses WHERE id = ?",
-    [args.id]
-  );
+    const connection = await createDatabaseConnection();
 
-  // early exit for nothing to delete
-  if (rows.length === 0) {
-    throw new GraphQLError("no matching course found to delete");
-  }
+    const [rows] = await connection.execute<RowDataPacket[]>(
+        "SELECT * FROM courses WHERE id = ?",
+        [args.id]
+    );
 
-  // for return info
-  const deletedCourse = rows[0];
+    // early exit for nothing to delete
+    if (rows.length === 0) {
+        throw new GraphQLError("no matching course found to delete");
+    }
 
-  const [result] = await connection.execute<ResultSetHeader>(
-    "DELETE FROM courses WHERE id = ?",
-    [args.id]
-  );
+    // for return info
+    const deletedCourse = rows[0];
 
-  // check deletion was successful
-  if (result.affectedRows === 0) {
-    throw new GraphQLError("no matching course found to delete");
-  }
+    const [result] = await connection.execute<ResultSetHeader>(
+        "DELETE FROM courses WHERE id = ?",
+        [args.id]
+    );
 
-  await connection.end();
+    // check deletion was successful
+    if (result.affectedRows === 0) {
+        throw new GraphQLError("no matching course found to delete");
+    }
 
-  return deletedCourse;
+    await connection.end();
+
+    return deletedCourse;
 };

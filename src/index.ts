@@ -6,11 +6,15 @@ import path from "path";
 const __dirname = path.resolve();
 
 const typeDefs = readFileSync(
-  path.join(__dirname, "./", "src", "schema.graphql"),
-  "utf8"
+    path.join(__dirname, "./", "src", "schema.graphql"),
+    "utf8"
 );
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: ({ req }) => ({ req }),
+});
 
 server.listen().then(({ url }) => {
-  console.log(`Server ready at ${url}`);
+    console.log(`Server ready at ${url}`);
 });

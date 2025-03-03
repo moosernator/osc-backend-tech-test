@@ -4,6 +4,7 @@ import { createConnection } from "mysql2/promise";
 import { Course, SortOrder } from "../graphql.types.js";
 import resolvers from "../resolvers.js";
 import { GraphQLError } from "graphql";
+import { Context } from "../types.js";
 
 jest.mock("mysql2/promise");
 jest.mock("bcrypt");
@@ -15,6 +16,7 @@ describe("Resolvers", () => {
     const endSpy = jest.fn();
     const compareSpy = jest.spyOn(bcrypt, "compare");
     const signSpy = jest.spyOn(jwt, "sign");
+    const verifySpy = jest.spyOn(jwt, "verify");
 
     beforeEach(async () => {
         mockConnection = {
@@ -208,21 +210,29 @@ describe("Resolvers", () => {
     });
 
     describe("Mutations", () => {
+        beforeEach(() => {
+            verifySpy.mockImplementationOnce(() => ({ username: "testuser" }));
+        });
+
         describe("when calling the addCourse mutation", () => {
             it("should create a new course", async () => {
                 mockConnection.execute
                     .mockResolvedValueOnce([{ insertId: mockCourses[0].id }])
                     .mockResolvedValueOnce([[mockCourses[0]]]);
 
-                const course = await resolvers.Mutation.addCourse(null, {
-                    input: {
-                        courseTitle: mockCourses[0].courseTitle,
-                        courseDescription: mockCourses[0].courseDescription,
-                        courseDuration: mockCourses[0].courseDuration,
-                        courseOutcome: mockCourses[0].courseOutcome,
-                        courseCollection: mockCourses[0].courseCollection,
+                const course = await resolvers.Mutation.addCourse(
+                    null,
+                    {
+                        input: {
+                            courseTitle: mockCourses[0].courseTitle,
+                            courseDescription: mockCourses[0].courseDescription,
+                            courseDuration: mockCourses[0].courseDuration,
+                            courseOutcome: mockCourses[0].courseOutcome,
+                            courseCollection: mockCourses[0].courseCollection,
+                        },
                     },
-                });
+                    { req: { headers: { authorization: "jwt" } } } as Context
+                );
 
                 expect(executeSpy).toHaveBeenNthCalledWith(
                     1,
@@ -250,9 +260,15 @@ describe("Resolvers", () => {
                 mockConnection.execute.mockResolvedValueOnce([[]]);
 
                 await expect(
-                    resolvers.Mutation.deleteCourse(null, {
-                        id: 1,
-                    })
+                    resolvers.Mutation.deleteCourse(
+                        null,
+                        {
+                            id: 1,
+                        },
+                        {
+                            req: { headers: { authorization: "jwt" } },
+                        } as Context
+                    )
                 ).rejects.toThrow(
                     new GraphQLError("no matching course found to delete")
                 );
@@ -263,9 +279,13 @@ describe("Resolvers", () => {
                     .mockResolvedValueOnce([[mockCourses[0]]])
                     .mockResolvedValueOnce([{ insertId: mockCourses[0].id }]);
 
-                const course = await resolvers.Mutation.deleteCourse(null, {
-                    id: 123,
-                });
+                const course = await resolvers.Mutation.deleteCourse(
+                    null,
+                    {
+                        id: 123,
+                    },
+                    { req: { headers: { authorization: "jwt" } } } as Context
+                );
 
                 expect(executeSpy).toHaveBeenNthCalledWith(
                     1,
@@ -288,10 +308,14 @@ describe("Resolvers", () => {
                     .mockResolvedValueOnce([{ affectedRows: 1 }])
                     .mockResolvedValueOnce([[mockCourses[0]]]);
 
-                const course = await resolvers.Mutation.updateCourse(null, {
-                    id: 123,
-                    input: { courseTitle: "New title" },
-                });
+                const course = await resolvers.Mutation.updateCourse(
+                    null,
+                    {
+                        id: 123,
+                        input: { courseTitle: "New title" },
+                    },
+                    { req: { headers: { authorization: "jwt" } } } as Context
+                );
 
                 expect(executeSpy).toHaveBeenNthCalledWith(
                     1,
@@ -309,10 +333,16 @@ describe("Resolvers", () => {
 
             it("should handle no fields to update", async () => {
                 await expect(
-                    resolvers.Mutation.updateCourse(null, {
-                        id: 123,
-                        input: {},
-                    })
+                    resolvers.Mutation.updateCourse(
+                        null,
+                        {
+                            id: 123,
+                            input: {},
+                        },
+                        {
+                            req: { headers: { authorization: "jwt" } },
+                        } as Context
+                    )
                 ).rejects.toThrow(new GraphQLError("no fields to update"));
             });
 
@@ -322,10 +352,16 @@ describe("Resolvers", () => {
                 ]);
 
                 await expect(
-                    resolvers.Mutation.updateCourse(null, {
-                        id: 123,
-                        input: { courseTitle: "Test" },
-                    })
+                    resolvers.Mutation.updateCourse(
+                        null,
+                        {
+                            id: 123,
+                            input: { courseTitle: "Test" },
+                        },
+                        {
+                            req: { headers: { authorization: "jwt" } },
+                        } as Context
+                    )
                 ).rejects.toThrow(
                     new GraphQLError("no matching course found to update")
                 );

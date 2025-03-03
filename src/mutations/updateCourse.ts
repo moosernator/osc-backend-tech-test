@@ -2,11 +2,16 @@ import { GraphQLError } from "graphql";
 import { ResultSetHeader } from "mysql2";
 import { createDatabaseConnection } from "../database.js";
 import { UpdateCourseInput } from "../graphql.types.js";
+import { authenticateWithJwt } from "../auth.js";
+import { Context } from "../types.js";
 
 export const updateCourse = async (
     _parent,
-    args: { id: number; input: UpdateCourseInput }
+    args: { id: number; input: UpdateCourseInput },
+    context: Context
 ) => {
+    authenticateWithJwt(context);
+
     const connection = await createDatabaseConnection();
 
     const fieldsToUpdate: string[] = [];
